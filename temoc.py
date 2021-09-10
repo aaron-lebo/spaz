@@ -1,6 +1,7 @@
 import sqlite3
 import time
 
+import feedparser
 import requests
 
 subs = 'news worldnews'.split()
@@ -22,7 +23,15 @@ while 1:
         con.commit()
         time.sleep(1)
 
-    ids = {x[0] for x in cur.execute(f'select id from things where site != "hn"').fetchall()}
+    ids = {x[0] for x in cur.execute('select id from things where site = "lobsters"').fetchall()}
+    r = requests.get('https://lobste.rs/newest.rss')
+    for x in feedparser.parse(r.text).entries: 
+         if not x['id'] in ids:
+            x = ['lobsters', x['id'], time.mktime(x['published_parsed']), x['title'], x['link']]
+            cur.execute('insert into things values (?, ?, ?, ?, ?)', x)
+            con.commit()
+
+    ids = {x[0] for x in cur.execute('select id from things where site like "r/%"').fetchall()}
     for sub in subs:
         r = requests.get(f'https://www.reddit.com/r/{sub}.json', headers={'User-agent': 'temoc 0.1'})
         for x in (x['data'] for x in r.json()['data']['children']):
