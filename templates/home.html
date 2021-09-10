@@ -1,0 +1,24 @@
+<!doctype html>
+<head>
+  <title>hola</title>
+  <style>
+    body { background-color: #212121; color: #ddd; padding: 2em; }
+    a { color: #88f; text-decoration: none; }
+    a:visited { color: #88c; }
+    ul { list-style-type: none; }
+    li { margin-bottom: 2em; }
+    p { margin-bottom: 0.8em; }
+    div.url { margin-bottom: 0.8em; }
+  </style>
+</head>
+<body>
+  <ul>
+    {% for x in things %}
+    <li>
+      <p>{{ x.title }}</p>
+      <div class="url"><a href="{{ x.url }}">{{ x.url1 }}</a></div>
+      <div>{{ x.site }} {{ x.utc }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+</body>
