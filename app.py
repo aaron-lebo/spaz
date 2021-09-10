@@ -8,7 +8,7 @@ app = Flask(__name__)
 def db():
     db = getattr(g, '_db', None)
     if db is None:
-        db = g._db = sqlite3.connect('spaz.db')
+        db = g._db = sqlite3.connect('temoc.db')
         db.row_factory = sqlite3.Row
     return db
 
@@ -21,12 +21,9 @@ def close_connection(exc):
 @app.route('/')
 def home():
     qy = 'select * from things order by utc desc'
-    xs = db().cursor().execute(qy).fetchall()
-    things = []
-    for x in xs:
-        x = dict(x)
+    ys, xs = [], db().cursor().execute(qy).fetchall()
+    for x in (dict(x) for x in xs):
         x['utc'] = datetime.datetime.fromtimestamp(x['utc'])
         x['url1'] = x['url'].replace('https://', '').replace('www.', '')
-        x['url1'] = x['url1'].split('?')[0]
-        things.append(x)
-    return render_template('home.html', things=things)
+        ys.append(x)
+    return render_template('home.html', things=ys)
