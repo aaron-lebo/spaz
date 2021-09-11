@@ -30,5 +30,9 @@ def home():
     for x in (dict(x) for x in xs):
         x['utc'] = datetime.datetime.fromtimestamp(x['utc'])
         x['url1'] = strip(x['url'], 'http://', 'https://', 'www.')
+        id, site = x['id'], x['site']
+        if site == 'hn': x['href'] = f'https://news.ycombinator.com/item?id={id}'
+        elif site == 'lobsters': x['href'] = id
+        else: x['href'] = f'https://old.reddit.com/{site}/comments/{id}'
         ys.append(x)
     return render_template('home.html', things=ys)

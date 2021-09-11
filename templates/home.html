@@ -4,11 +4,14 @@
   <style>
     body { background-color: #212121; color: #ddd; padding: 1em; }
     a { color: #88f; text-decoration: none; }
+    a:hover { color: #88f; text-decoration: underline; }
     a:visited { color: #88c; }
     ul { line-height: 1.6em; list-style-type: none; }
     li { margin-bottom: 2em; }
     p { line-height: 1.6em; margin-bottom: 0.8em;  }
     div.url { margin-bottom: 0.8em; }
+    div.utc a { color: #ddd; }
+    div.utc a:visited { color: #ccc; }
   </style>
 </head>
 <body>
@@ -17,7 +20,7 @@
     <li>
       <p>{{ x.title }}</p>
       <div class="url"><a href="{{ x.url }}">{{ x.url1 }}</a></div>
-      <div>{{ x.site }} {{ x.utc }}</div>
+      <div class="utc">{{ x.site }} <a href="{{ x.href }}">{{ x.utc }}</a></div>
     </li>
     {% endfor %}
   </ul>
