@@ -18,12 +18,17 @@ def close_connection(exc):
     if db is not None:
         db.close()
 
+def strip(x, *args):
+    for y in args: 
+        x = x.replace(y, '') 
+    return x
+
 @app.route('/')
 def home():
     qy = 'select * from things order by utc desc'
     ys, xs = [], db().cursor().execute(qy).fetchall()
     for x in (dict(x) for x in xs):
         x['utc'] = datetime.datetime.fromtimestamp(x['utc'])
-        x['url1'] = x['url'].replace('https://', '').replace('www.', '')
+        x['url1'] = strip(x['url'], 'http://', 'https://', 'www.')
         ys.append(x)
     return render_template('home.html', things=ys)
