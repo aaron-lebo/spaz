@@ -48,7 +48,6 @@ def things(id):
     for x in ['save', 'hide']:
         if f.get(x, None) is not None:
             d, qy = db(), f'update things set {x} = 1 where site = ? and id = ?'
-            print(f['site'], id)
             d.cursor().execute(qy, (f['site'], id))
             d.commit()
     return redirect('/')
