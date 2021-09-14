@@ -11,7 +11,9 @@
     p { line-height: 1.6em; margin-bottom: 0.8em;  }
     div.url { margin-bottom: 0.8em; }
     div.utc a { color: #ddd; }
-    div.utc a:visited { color: #ccc; }
+    div.utc a:visited { color: #bbb; }
+    div.utc form { display: inline; }
+    div.utc button { background-color: #212121; border: none; color: #ddd; }
   </style>
 </head>
 <body>
@@ -19,8 +21,18 @@
     {% for x in things %}
     <li>
       <p>{{ x.title }}</p>
-      <div class="url"><a href="{{ x.url }}">{{ x.url1 }}</a></div>
-      <div class="utc">{{ x.site }} <a href="{{ x.href }}">{{ x.utc }}</a></div>
+      <div class="url">
+        <a href="/{{ x.dom.0 }}">{{ x.dom.0 }}</a>/<a href="{{ x.url }}">{{ x.dom.1 }}</a>
+      </div>
+      <div class="utc">
+        {{ x.site }} 
+        <a href="{{ x.href }}">{{ x.utc }}</a>
+	<form method="post" action="/things/{{ x.id }}">
+          <input name="site" value="{{ x.site }}" type="hidden" />
+          <button name="save" type="submit">save</button>
+          <button name="hide" type="submit">hide</button>
+        </form>
+      </div>
     </li>
     {% endfor %}
   </ul>

@@ -4,18 +4,20 @@ import time
 import feedparser
 import requests
 
-subs = 'news worldnews'.split()
+subs = [x.strip() for x in open('subs.txt').readlines()]
 
 con = sqlite3.connect('temoc.db')
 cur = con.cursor()
 try:
-    cur.execute('create table things(site, id, utc timestamp, title, url)')
+    cur.execute('create table things(site, id text, utc timestamp, save integer, hide integer, title, url)')
+    cur.execute('create unique index things_site_id on things(site, id)')
+    con.commit()
 except sqlite3.OperationalError:
     pass
 
 def insert(ids, *args):
     if not args[1] in ids:
-        cur.execute('insert into things values (?, ?, ?, ?, ?)', args)
+        cur.execute('insert into things values (?, ?, ?, 0, 0, ?, ?)', args)
         con.commit()
         ids.add(args[1])
 
@@ -30,7 +32,7 @@ while 1:
     ids = {x[0] for x in cur.execute('select id from things where site = "lobsters"').fetchall()}
     r = requests.get('https://lobste.rs/newest.rss')
     for x in feedparser.parse(r.text).entries: 
-        insert(ids, 'lobsters', x['id'], time.mktime(x['published_parsed']), x['title'], x['link'])
+        insert(ids, 'lobsters', x['id'][20:], time.mktime(x['published_parsed']), x['title'], x['link'])
 
     ids = {x[0] for x in cur.execute('select id from things where site like "r/%"').fetchall()}
     for sub in subs:
