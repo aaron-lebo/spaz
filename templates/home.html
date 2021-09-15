@@ -8,7 +8,9 @@
     a:visited { color: #88c; }
     ul { line-height: 1.6em; list-style-type: none; }
     li { margin-bottom: 2em; }
-    p { line-height: 1.6em; margin-bottom: 0.8em;  }
+    ul#nav { margin-bottom: 2em; }
+    ul#nav li { display: inline; margin-right: 1em; }
+    p { line-height: 1.6em; margin-bottom: 0.8em; }
     div.url { margin-bottom: 0.8em; }
     div.utc a { color: #ddd; }
     div.utc a:visited { color: #bbb; }
@@ -17,6 +19,12 @@
   </style>
 </head>
 <body>
+  <ul id="nav">
+    <li><a href="/">unread</a> {{ n_unread }}</li>
+    <li><a href="/saved">saved</a> {{ n_saved }}</li>
+    <li><a href="/hidden">hidden</a> {{ n_hidden }}</li>
+    <li><a href="/all">all</a> {{ n }}</li>
+  </ul>
   <ul>
     {% for x in things %}
     <li>
@@ -27,7 +35,7 @@
       <div class="utc">
         {{ x.site }} 
         <a href="{{ x.href }}">{{ x.utc }}</a>
-	<form method="post" action="/things/{{ x.id }}">
+        <form method="post" action="/things/{{ x.id }}">
           <input name="site" value="{{ x.site }}" type="hidden" />
           <button name="save" type="submit">save</button>
           <button name="hide" type="submit">hide</button>

@@ -23,10 +23,13 @@ def strip(x, *args):
         x = x.replace(y, '') 
     return x
 
-@app.route('/')
-def home():
-    qy = 'select * from things where save = 0 and hide = 0 order by utc desc'
-    ys, xs = [], db().cursor().execute(qy).fetchall()
+def things(where):
+    d = db()
+    n_unread = d.cursor().execute('select count(*) from things where save = 0 and hide = 0').fetchone()[0]
+    n_saved = d.cursor().execute('select count(*) from things where save = 1').fetchone()[0]
+    n_hidden = d.cursor().execute('select count(*) from things where hide = 1').fetchone()[0]
+    n = d.cursor().execute('select count(*) from things').fetchone()[0]
+    ys, xs = [], d.cursor().execute(f'select * from things where {where} order by utc desc').fetchall()
     for x in (dict(x) for x in xs):
         x['utc'] = datetime.datetime.fromtimestamp(x['utc'])
         x['url1'] = strip(x['url'], 'http://', 'https://', 'www.')
@@ -40,10 +43,26 @@ def home():
         else: 
             x['href'] = f'https://old.reddit.com/{site}/{id}'
         ys.append(x)
-    return render_template('home.html', things=ys)
+    return render_template('home.html', n_unread=n_unread, n_saved=n_saved, n_hidden=n_hidden, n=n, things=ys)
+
+@app.route('/')
+def unread():
+    return things('save = 0 and hide = 0')
+
+@app.route('/saved')
+def saved():
+    return things('save = 1')
+
+@app.route('/hidden')
+def hidden():
+    return things('hide = 1')
+
+@app.route('/all')
+def all():
+    return things('id is not null')
 
 @app.route('/things/<id>', methods=['post'])
-def things(id):
+def things_edit(id):
     f = request.form
     for x in ['save', 'hide']:
         if f.get(x, None) is not None:
