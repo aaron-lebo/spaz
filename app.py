@@ -29,7 +29,13 @@ def things(where):
     n_saved = d.cursor().execute('select count(*) from things where save = 1').fetchone()[0]
     n_hidden = d.cursor().execute('select count(*) from things where hide = 1').fetchone()[0]
     n = d.cursor().execute('select count(*) from things').fetchone()[0]
-    ys, xs = [], d.cursor().execute(f'select * from things where {where} order by utc desc').fetchall()
+
+    args, site = tuple(), request.args.get('site')
+    if site:
+        where = f'{where} and site = ?'
+        args = (site,)
+
+    ys, xs = [], d.cursor().execute(f'select * from things where {where} order by utc desc', args).fetchall()
     for x in (dict(x) for x in xs):
         x['utc'] = datetime.datetime.fromtimestamp(x['utc'])
         x['url1'] = strip(x['url'], 'http://', 'https://', 'www.')
@@ -43,7 +49,9 @@ def things(where):
         else: 
             x['href'] = f'https://old.reddit.com/{site}/{id}'
         ys.append(x)
-    return render_template('home.html', n_unread=n_unread, n_saved=n_saved, n_hidden=n_hidden, n=n, things=ys)
+
+    zs = d.cursor().execute(f'select site, count(*) from things where {where} group by site', args).fetchall()
+    return render_template('home.html', n_unread=n_unread, n_saved=n_saved, n_hidden=n_hidden, n=n, things=ys, sites=zs)
 
 @app.route('/')
 def unread():
